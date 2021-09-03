@@ -1,4 +1,4 @@
-# rss_r
+# R workshop RSS
  
 Introductory R workshop hosted at the [2021 conference for the Royal Statistical Society](https://www.rss.org.uk/training-events/conference2021/).
 
