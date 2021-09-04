@@ -82,23 +82,46 @@ animal_clean_df <- animal_clean_df %>%
   unite(col = "new_date", month, cal_year, sep = " ", remove = FALSE)
 
 # Download shapefiles.
-download.file(url = "https://data.london.gov.uk/download/statistical-gis-boundary-files-london/08d31995-dd27-423c-a987-57fe8e952990/London-wards-2018.zip",
-              destfile = "data/london_wards.zip")
+download.file(url = "https://data.london.gov.uk/download/statistical-gis-boundary-files-london/9ba8c833-6370-4b11-abdc-314aa020d5e0/statistical-gis-boundaries-london.zip",
+              destfile = "data/london_gis.zip")
 
 # Unzip.
-unzip(zipfile = "data/london_wards.zip", exdir = "data")
+unzip(zipfile = "data/london_gis.zip", exdir = "data")
 
 # Load in shapefiles.
-wards_sf <- st_read("data/London-wards-2018_ESRI/London_Ward.shp")
+bor_sf <- st_read("data/statistical-gis-boundaries-london/ESRI/London_Borough_Excluding_MHW.shp")
+
+# Check.
+ggplot(data = bor_sf) +
+  geom_sf()
 
 # Check lengths.
-length(unique(wards_sf$GSS_CODE))
-length(unique(animal_clean_df$ward_code))
+length(unique(bor_sf$GSS_CODE))
+length(unique(animal_clean_df$borough_code))
 
-# Aggregate the data we want to map out.
-animals_aggregate_df <- animal_clean_df %>% 
-  group_by()
+# Which ones?
+`%nin%` <- Negate(`%in%`)
+
+missbor_df <- animal_clean_df %>% 
+  select(borough_code, borough) %>% 
+  distinct(borough_code, borough) %>% 
+  filter(borough_code %nin% bor_sf$GSS_CODE)
+
+# Drop those incidents which occur outside of these, and tidy for join.
+animal_clean_ldn_df <- animal_clean_df %>% 
+  filter(borough_code %in% bor_sf$GSS_CODE) %>%
+  group_by(borough_code, animal_group_recode) %>% 
+  summarise(counts = n()) %>% 
+  ungroup() %>% 
+  pivot_wider(id_cols = borough_code, values_from = counts, names_from = animal_group_recode)
   
+# Make the join.
+animal_clean_ldn_sf <- left_join(bor_sf, animal_clean_ldn_df,
+                                 by = c("GSS_CODE" = "borough_code"))
 
-
-
+# Basic map.
+ggplot(data = animal_clean_ldn_sf) +
+  geom_sf(mapping = aes(fill = Bird), colour = "transparent") +
+  scale_fill_viridis_c() +
+  labs(fill = NULL, title = "LFB bird incidents, 2009-2021") +
+  theme_minimal() 
