@@ -20,11 +20,15 @@ head(animal_df)
 tail(animal_df)
 sum(is.na(animal_df)) 
 
+# Frequency checks.
+animal_df %>% 
+  group_by(cal_year) %>%
+  summarise(counts = n())
+
 # Initial cleaning, dealing with dates and time.
 animal_clean_df <- animal_df %>% 
   clean_names() %>% 
   filter(cal_year != 2021) %>% 
-  select(-type_of_incident) %>% 
   mutate(date_time_lub  = dmy_hm(date_time_of_call),
          date_time_lubr = round_date(date_time_lub, unit = "hour"),
          month_year     = round_date(date_time_lub, unit = "month"),
@@ -54,9 +58,28 @@ animal_clean_df <- animal_clean_df %>%
 
 # Demonstrate.
 
-# Months with animal type.
+# Total months with animal type.
 ggplot(data = animal_clean_df) +
   geom_bar(mapping = aes(x = month, fill = animal_group_recode))
+
+# String tricks.
+
+# Involving water?
+water_df <- animal_clean_df %>% 
+  filter(str_detect(special_service_type, "water|Water"))
+
+animal_clean_df %>%
+  mutate(water_or_not = if_else(str_detect(special_service_type, "water|Water"), "yes", "no")) %>% 
+  group_by(water_or_not) %>% 
+  summarise(counts = n())
+
+# Splitting columns.
+animal_clean_df <- animal_clean_df %>% 
+  separate(col = special_service_type, into = c("desc1", "desc2"), sep = "-", remove = FALSE)
+
+# Uniting columns.
+animal_clean_df <- animal_clean_df %>% 
+  unite(col = "new_date", month, cal_year, sep = " ", remove = FALSE)
 
 # Download shapefiles.
 download.file(url = "https://data.london.gov.uk/download/statistical-gis-boundary-files-london/08d31995-dd27-423c-a987-57fe8e952990/London-wards-2018.zip",
