@@ -69,6 +69,14 @@ rescues_df <- animals_clean_df %>%
 
 # Download/unzip data.
 
+# Download shapefiles.
+download.file(url = "https://data.london.gov.uk/download/statistical-gis-boundary-files-london/9ba8c833-6370-4b11-abdc-314aa020d5e0/statistical-gis-boundaries-london.zip",
+              destfile = "data/london_gis.zip")
+
+# Unzip.
+unzip(zipfile = "data/london_gis.zip", exdir = "data")
+
+
 # Load in shapefile.
 borough_sf <- st_read("data/statistical-gis-boundaries-london/ESRI/London_Borough_Excluding_MHW.shp")
 
