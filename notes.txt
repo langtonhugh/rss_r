@@ -1,0 +1,35 @@
+- Explore dimensions, missings
+- variable names
+- Dates
+	- dmy_hm
+	- round_date
+	- hour
+	- wday
+	- month
+- ggplot
+	- bar plot hours counts
+	- bar plot month counts
+- animal types?
+	- animal_group_parent
+- recode animal types
+	- cat
+	- fct_lump
+- bar plot months, fill animal type
+- string detect for water
+
+- separate()
+- unit()
+
+- download shapefile
+- unzip
+
+- identify those boroughs which are not contained
+  in the official shapefile
+
+- only retain those incidents occuring in London boroughs
+
+- frequency counts by borough and by animal type (new recode)
+  then pivot wider for join.
+- join
+
+- map for birds

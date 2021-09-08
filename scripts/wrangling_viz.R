@@ -20,11 +20,6 @@ head(animal_df)
 tail(animal_df)
 sum(is.na(animal_df)) 
 
-# Frequency checks.
-animal_df %>% 
-  group_by(cal_year) %>%
-  summarise(counts = n())
-
 # Initial cleaning, dealing with dates and time.
 animal_clean_df <- animal_df %>% 
   clean_names() %>% 
